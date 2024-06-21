@@ -43,3 +43,5 @@ main:
             search: "${searchTerm}"
             language: "en"
         result: wikiResult
+    - returnOutputDefaultLanguage:
+        return: '${wikiResult.body[1]}'
