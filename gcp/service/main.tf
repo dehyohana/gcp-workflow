@@ -15,5 +15,5 @@ module "scheduler" {
   schedule_time             = var.schedule_time
   time_zone                 = var.time_zone
   workflow_uri              = "https://workflowexecutions.googleapis.com/v1/${module.workflow.workflow_id}/executions"
-  http_method               = "GET"
+  http_method               = "POST"
 }
