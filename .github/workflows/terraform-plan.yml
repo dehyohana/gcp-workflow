@@ -1,0 +1,68 @@
+name: Terraform Infrastructure Plan
+
+on: 
+  pull_request:
+    branches:
+    - main
+    paths:
+      - 'gcp/modules/**'
+      - 'gcp/service/**'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to run deploy (dev, stg, prd)"
+        type: environment
+        required: true
+        default: "dev"
+
+jobs:
+  infra:
+    name: Infra Plan
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment || 'dev' }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Modify backend.tf
+        run: |
+          sed -i 's/terraform-gcp-workflow/terraform-gcp-workflow-${{ inputs.environment || 'dev' }}/g' backend.tf
+        working-directory: gcp/service
+      
+      - name: Show changes
+        run: git diff
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.6.0-beta2
+          terraform_wrapper: false
+          working-directory: gcp/service
+
+      - name: Terraform Version
+        run: terraform --version
+
+      - name: Export Google Cloud credentials
+        run: echo "$GCP_SA_KEY" > gcp/service/credentials.json
+        env:
+          GCP_SA_KEY: ${{ secrets.CREDENTIALS }}
+      
+      - name: Terraform Init
+        id: Init
+        run: |
+          terraform init
+        working-directory: gcp/service
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ./credentials.json
+
+      - name: Terraform Plan
+        id: plan
+        run: |
+          terraform plan -out tf.plan \
+          -var="credentials=./credentials.json" \
+          -var="region=${{vars.REGION}}" \
+          -var="project=${{vars.PROJECT}}" \
+          -var="workflow_name=${{vars.WORKFLOW_NAME}}" \
+          -var="workflow_definition_path=${{vars.WORKFLOW_DEFINITION_PATH}}"
+        working-directory: gcp/service
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ./credentials.json
