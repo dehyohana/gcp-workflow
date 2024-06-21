@@ -1,4 +1,4 @@
-name: Terraform Infrastructure Plan
+name: Terraform Infrastructure Apply
 
 on: 
   push:
