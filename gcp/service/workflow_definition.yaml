@@ -13,7 +13,7 @@ main:
             assign:
               - language: '${input.language}'
             next: getLocation
-          - condition: '${"language" not in input}'
+          - condition: '${not ("language" in input)}'
             next: getLocationDefaultLanguage
     - getLocation:
         call: sys.get_env
@@ -52,6 +52,8 @@ main:
             action: opensearch
             search: '${searchTerm}'
         result: wikiResult
-        next: returnOutput
+        next: returnOutputDefaultLanguage
     - returnOutput:
+        return: '${wikiResult.body[1]}'
+    - returnOutputDefaultLanguage:
         return: '${wikiResult.body[1]}'
