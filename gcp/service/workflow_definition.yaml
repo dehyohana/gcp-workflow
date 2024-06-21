@@ -9,17 +9,18 @@ main:
             next: checkLanguageInInput
     - checkLanguageInInput:
         switch:
-          - condition: '${"language" in input}'
+          - condition: '${input.language != null}'
             assign:
               - language: '${input.language}'
             next: getLocation
-          - condition: '${"language" not in input}'
+          - condition: '${input.language == null}'
             next: getLocationDefaultLanguage
     - getLocation:
         call: sys.get_env
         args:
           name: GOOGLE_CLOUD_LOCATION
         result: location
+        next: setFromCallResult
     - setFromCallResult:
         assign:
           - searchTerm: '${text.split(location, "-")[0]}'
@@ -29,6 +30,7 @@ main:
         args:
           name: GOOGLE_CLOUD_LOCATION
         result: location
+        next: setFromCallResultDefaultLanguage
     - setFromCallResultDefaultLanguage:
         assign:
           - searchTerm: '${text.split(location, "-")[0]}'
@@ -41,8 +43,7 @@ main:
             action: opensearch
             search: '${searchTerm}'
         result: wikiResult
-    - returnOutput:
-        return: '${wikiResult.body[1]}'
+        next: returnOutput
     - readWikipediaDefaultLanguage:
         call: http.get
         args:
@@ -51,5 +52,8 @@ main:
             action: opensearch
             search: '${searchTerm}'
         result: wikiResult
+        next: returnOutputDefaultLanguage
+    - returnOutput:
+        return: '${wikiResult.body[1]}'
     - returnOutputDefaultLanguage:
         return: '${wikiResult.body[1]}'
