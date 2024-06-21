@@ -62,7 +62,13 @@ jobs:
           -var="region=${{vars.REGION}}" \
           -var="project=${{vars.PROJECT}}" \
           -var="workflow_name=${{vars.WORKFLOW_NAME}}" \
-          -var="workflow_definition_path=${{vars.WORKFLOW_DEFINITION_PATH}}"
+          -var="workflow_definition_path=${{vars.WORKFLOW_DEFINITION_PATH}}" \
+          -var="workflow_description=${{vars.WORKFLOW_DESCRIPTION}}" \
+          -var="scheduler_id=${{vars.SCHEDULER_ID}}" \
+          -var="schedule_time=${{vars.SCHEDULE_TIME}}" \
+          -var="time_zone=${{vars.TIME_ZONE}}" \
+          -var="terraform_service_account=${{vars.TERRAFORM_SERVICE_ACCOUNT}}" \
+          -var="body_json_path=${{vars.BODY_JSON_PATH}}"
         working-directory: gcp/service
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ./credentials.json
