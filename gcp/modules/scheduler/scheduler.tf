@@ -15,7 +15,7 @@ resource "google_cloud_scheduler_job" "post_workflow_scheduler" {
     headers = {
       "Content-type" = "aplication/json"
     }
-    body = base64decode(jsonencode({
+    body = base64encode(jsonencode({
       "arguments" : var.body_json_path != "" ? jsonencode(jsondecode(file(var.body_json_path))) : "{}", "callLogLevel" : "CALL_LOG_LEVEL_UNSPECIFIED"
     }))
   }
