@@ -9,12 +9,12 @@ main:
             next: checkLanguageInInput
     - checkLanguageInInput:
         switch:
-          - condition: "${input.language != null}"
+          - condition: '${"language" in input}'
             assign:
-              - language: "${input.language}"
+              - language: '${input.language}'
             next: getLocation
-          - condition: "${input.language == null}"
-            next: readWikipediaDefaultLanguage
+          - condition: '${"language" not in input}'
+            next: getLocationDefaultLanguage
     - getLocation:
         call: sys.get_env
         args:
@@ -24,24 +24,32 @@ main:
         assign:
           - searchTerm: '${text.split(location, "-")[0]}'
         next: readWikipedia
+    - getLocationDefaultLanguage:
+        call: sys.get_env
+        args:
+          name: GOOGLE_CLOUD_LOCATION
+        result: location
+    - setFromCallResultDefaultLanguage:
+        assign:
+          - searchTerm: '${text.split(location, "-")[0]}'
+        next: readWikipediaDefaultLanguage
     - readWikipedia:
         call: http.get
         args:
           url: '${"https://" + language + ".wikipedia.org/w/api.php"}'
           query:
             action: opensearch
-            search: "${searchTerm}"
+            search: '${searchTerm}'
         result: wikiResult
     - returnOutput:
-        return: "${wikiResult.body[1]}"
+        return: '${wikiResult.body[1]}'
     - readWikipediaDefaultLanguage:
         call: http.get
         args:
-          url: '${"https://en.wikipedia.org/w/api.php"}'
+          url: 'https://en.wikipedia.org/w/api.php'
           query:
             action: opensearch
-            search: "${searchTerm}"
-            language: "en"
+            search: '${searchTerm}'
         result: wikiResult
     - returnOutputDefaultLanguage:
         return: '${wikiResult.body[1]}'
