@@ -5,15 +5,15 @@ main:
         switch:
           - condition: '${"searchTerm" in input}'
             assign:
-              - searchTerm: "${input.searchTerm}"
+              - searchTerm: '${input.searchTerm}'
             next: checkLanguageInInput
     - checkLanguageInInput:
         switch:
-          - condition: '${input.language != null}'
+          - condition: '${"language" in input}'
             assign:
               - language: '${input.language}'
             next: getLocation
-          - condition: '${input.language == null}'
+          - condition: '${"language" not in input}'
             next: getLocationDefaultLanguage
     - getLocation:
         call: sys.get_env
@@ -52,8 +52,6 @@ main:
             action: opensearch
             search: '${searchTerm}'
         result: wikiResult
-        next: returnOutputDefaultLanguage
+        next: returnOutput
     - returnOutput:
-        return: '${wikiResult.body[1]}'
-    - returnOutputDefaultLanguage:
         return: '${wikiResult.body[1]}'
