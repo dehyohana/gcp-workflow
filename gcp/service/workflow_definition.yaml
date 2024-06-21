@@ -23,7 +23,7 @@ main:
     - setFromCallResult:
         assign:
           - searchTerm: '${text.split(location, "-")[0]}'
-        nex: readWikipedia
+        next: readWikipedia
     - readWikipedia:
         call: http.get
         args:
