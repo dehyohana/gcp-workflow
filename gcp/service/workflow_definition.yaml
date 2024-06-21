@@ -12,7 +12,7 @@ main:
           - condition: "${input.language != null}"
             assign:
               - language: "${input.language}"
-            next: readWikipedia
+            next: getLocation
           - condition: "${input.language == null}"
             next: readWikipediaDefaultLanguage
     - getLocation:
@@ -23,6 +23,7 @@ main:
     - setFromCallResult:
         assign:
           - searchTerm: '${text.split(location, "-")[0]}'
+        nex: readWikipedia
     - readWikipedia:
         call: http.get
         args:
